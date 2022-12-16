@@ -45,7 +45,7 @@ def sourcecode():
                 sdata = str(data["body"])
                 try:
                     text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
-                    url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph'
+                    url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph?'+source+''
                     response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
                     url = "https://sapujagad.id/sjnotebook/"+sdata+""
                     my_dict = {}
