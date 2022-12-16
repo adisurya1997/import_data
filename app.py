@@ -53,13 +53,13 @@ def sourcecode():
                     xs = make_response(my_dict)
                     return xs
                 except:
-                    return jsonify({"msg": "Missing create paragraph code"}), 400
+                    return jsonify({"msg": "Missing create paragraph code"}), 500
             except:
-                return jsonify({"msg": "Missing create note"}), 400
+                return jsonify({"msg": "Missing create note"}), 500
         except:
-            return jsonify({"msg": "Missing Authorization"}), 401
+            return jsonify({"msg": "Missing Authorization"}), 501
     except:
-        return jsonify({"msg": "error server"}), 500
+        return jsonify({"msg": "error json input"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
