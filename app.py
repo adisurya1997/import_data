@@ -16,130 +16,48 @@ api_base_url = "https://api.stagingv3.microgen.id/query/api/v1/" + api_key
 def hello_geek():
     return '<h1>Hello from Flask</h2>'
 
-@app.get("/products")
-def getProducts():
+@app.post("/api/create/sourcecode")
+def sourcecode():
     try:
-        url = "/".join([api_base_url, "products"])
-        response = requests.get(url)
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.post("/products")
-def createProduct():
-    try:
-        url = "/".join([api_base_url, "products"])
-        response = requests.post(url, json.dumps(request.json, indent=2))
-        respBody = response.json()
-
-        if response.status_code != 201:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-        
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.get("/products/<id>")
-def getProductById(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.get(url)
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.patch("/products/<id>")
-def updateProduct(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.patch(url, json.dumps(request.json, indent=2))
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-        
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.delete("/products/<id>")
-def deleteProduct(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.delete(url)
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
+        if not request.is_json:
+            return jsonify({"msg": "Missing JSON in request"}), 400
+        request_data = request.get_json()
+        database = request_data['database']
+        table = request_data['table']
+        path_file = request_data['path_file']
+        name = request_data['name']
+        if not database:
+            return jsonify({"msg": "Missing database parameter"}), 400
+        if not table:
+            return jsonify({"msg": "Missing table parameter"}), 400
+        if not path_file:
+            return jsonify({"msg": "Missing path_file parameter"}), 400
+        if not name:
+            return jsonify({"msg": "Missing name parameter"}), 400
+        url = 'https://ezpdlqrjcm.function.microgen.id/api/login'
+        response1 = requests.post(url,data={'username': 'admin', 'password':'admin'})
+        if response1.status_code == 200:
+            source = str(response1.json()["Set-Cookie"])
+            url = 'https://ezpdlqrjcm.function.microgen.id/api/createnote?'+source+''
+            response2 = requests.post(url,json={"name":str(name)})
+            if response2.status_code == 200:
+                data = response2.json()
+                sdata = str(data["body"])
+                text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
+                url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph'
+                response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
+                if response3.status_code == 200:
+                    url = "https://sapujagad.id/sjnotebook/"+sdata+""
+                    my_dict = {}
+                    my_dict['Url']= url
+                    xs = make_response(my_dict)
+                    return xs
+            else:
+                return jsonify({"msg": "Missing create note"}), 400
+        else:
+            return jsonify({"msg": "Missing Authorization"}), 401
+    except:
+        return jsonify({"msg": "error server"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
