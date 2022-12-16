@@ -19,6 +19,8 @@ def hello_geek():
 @app.post("/api/create/sourcecode")
 def sourcecode():
     try:
+        if not request.is_json:
+            return jsonify({"msg": "Missing JSON in request"}), 400
         request_data = request.get_json()
         database = request_data['database']
         table = request_data['table']
