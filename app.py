@@ -52,8 +52,6 @@ def sourcecode():
                     my_dict['Url']= url
                     xs = make_response(my_dict)
                     return xs
-                else:
-                    return jsonify({"msg": "Missing create paragraph"}), 400
             else:
                 return jsonify({"msg": "Missing create note"}), 400
         else:
