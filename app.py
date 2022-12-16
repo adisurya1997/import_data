@@ -19,8 +19,6 @@ def hello_geek():
 @app.post("/api/create/sourcecode")
 def sourcecode():
     try:
-        if not request.is_json:
-            return jsonify({"msg": "Missing JSON in request"}), 400
         request_data = request.get_json()
         database = request_data['database']
         table = request_data['table']
@@ -34,27 +32,29 @@ def sourcecode():
             return jsonify({"msg": "Missing path_file parameter"}), 400
         if not name:
             return jsonify({"msg": "Missing name parameter"}), 400
-        url = 'https://ezpdlqrjcm.function.microgen.id/api/login'
-        response1 = requests.post(url,data={'username': 'admin', 'password':'admin'})
-        if response1.status_code == 200:
+        try:
+            url = 'https://ezpdlqrjcm.function.microgen.id/api/login'
+            response1 = requests.post(url,data={'username': 'admin', 'password':'admin'})
             source = str(response1.json()["Set-Cookie"])
-            url = 'https://ezpdlqrjcm.function.microgen.id/api/createnote?'+source+''
-            response2 = requests.post(url,json={"name":str(name)})
-            if response2.status_code == 200:
+            try:
+                url = 'https://ezpdlqrjcm.function.microgen.id/api/createnote?'+source+''
+                response2 = requests.post(url,json={"name":str(name)})
                 data = response2.json()
                 sdata = str(data["body"])
-                text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
-                url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph'
-                response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
-                if response3.status_code == 200:
+                try:
+                    text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
+                    url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph'
+                    response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
                     url = "https://sapujagad.id/sjnotebook/"+sdata+""
                     my_dict = {}
                     my_dict['Url']= url
                     xs = make_response(my_dict)
                     return xs
-            else:
+                except:
+                    return jsonify({"msg": "Missing create paragraph code"}), 400
+            except:
                 return jsonify({"msg": "Missing create note"}), 400
-        else:
+        except:
             return jsonify({"msg": "Missing Authorization"}), 401
     except:
         return jsonify({"msg": "error server"}), 500
