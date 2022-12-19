@@ -50,7 +50,7 @@ def sourcecode():
                     data = responseget.json()
                     paragraphid = str(data["body"]["paragraphs"][0]["id"])
                     url4 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph/'+paragraphid+'?'+source+''
-                    responseput = requests.put(url,json={"text":str(text1)})
+                    responseput = requests.put(url4,json={"text":str(text1)})
                     try:
                         text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
                         url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph?'+source+''
