@@ -39,25 +39,41 @@ def sourcecode():
             response1 = requests.post(url,data={'username': 'admin', 'password':'admin'})
             source = str(response1.json()["Set-Cookie"])
             try:
-                url = 'https://ezpdlqrjcm.function.microgen.id/api/createnote?'+source+''
-                response2 = requests.post(url,json={"name":str(name)})
+                url1 = 'https://ezpdlqrjcm.function.microgen.id/api/createnote?'+source+''
+                response2 = requests.post(url1,json={"name":str(name)})
                 data = response2.json()
                 sdata = str(data["body"])
                 try:
-                    text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
-                    url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph?'+source+''
-                    response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
-                    url = "https://sapujagad.id/sjnotebook/"+sdata+""
-                    my_dict = {}
-                    my_dict['Url']= url
-                    xs = make_response(my_dict)
-                    return xs
+                    text1 = "%md"
+                    url3 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'?'+source+''
+                    responseget = requests.get(url3)
+                    data = responseget.json()
+                    paragraphid = str(data["body"]["paragraphs"][0]["id"])
+                    url4 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph/'+paragraphid+'?'+source+''
+                    responseput = requests.put(url,json={"text":str(text1)})
+                    try:
+                        text = "%jdbc(hive)\nLOAD DATA INPATH '"+path_file+"' INTO TABLE "+database+"."+table+"\n"
+                        url2 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph?'+source+''
+                        response3 = requests.post(url2,json={"title": "Paragraph insert revised","text":text })
+                        try:
+                            text12 = "%jdbc(hive)\nselect * from "+database+"."+table+"\n"
+                            url12 = 'https://ezpdlqrjcm.function.microgen.id/api/notebook/'+sdata+'/paragraph?'+source+''
+                            response1 = requests.post(url12,json={"title": "Paragraph insert revised","text":text12 })
+                            url = "https://sapujagad.id/sjnotebook/"+sdata+""
+                            my_dict = {}
+                            my_dict['Url']= url
+                            xs = make_response(my_dict)
+                            return xs
+                        except:
+                            return jsonify({"msg": "Missing create paragraph2 code"}), 500
+                    except:
+                        return jsonify({"msg": "Missing create paragraph code"}), 500
                 except:
-                    return jsonify({"msg": "Missing create paragraph code"}), 500
+                    return jsonify({"msg": "Missing update paragraph code"}), 500
             except:
                 return jsonify({"msg": "Missing create note"}), 500
         except:
-            return jsonify({"msg": "Missing Authorization"}), 501
+            return jsonify({"msg": "Missing Authorization"}), 400
     except:
         return jsonify({"msg": "error json input"}), 400
 
